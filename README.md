@@ -1,7 +1,7 @@
 FIX ISSUES :- 
 1. Original bytes restore function of kernel patch not working
 2. adapt shellcode to disable seccomp
-3. adapt to samsung seprare branch
+3. adapt to samsung device maybe seprate branch add func of finding kernel base using gpu
 4. change README
 
 🤝 Contributing
