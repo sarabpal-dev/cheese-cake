@@ -11,7 +11,7 @@ In the demo video, this method successfully:
 
 ⚠️ **Important Limitation**  
 The modifications are **not persistent**.  
-After a reboot, Android restores the original system image, causing all changes made through this method to be reverted automatically even files inside /data/.
+After a reboot, Android restores the original system image, causing all changes made through this method to be reverted automatically but files or partition which are mounted as r/w remain persistent across reboot.
 
 Despite being non-persistent, this technique still represents a powerful primitive for:
 - Temporary privilege escalation  
