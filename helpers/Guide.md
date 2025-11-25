@@ -76,7 +76,7 @@ You have two options:
 
 ### Option A: Use Pre-compiled vmlinux (Recommended)
 
-1. Check the releases in [https://github.com/sarabpal-dev/GKI_KernelSU_SUSFS](#) (link in releases)
+1. Check the releases in [https://github.com/sarabpal-dev/GKI_KernelSU_SUSFS](https://github.com/sarabpal-dev/GKI_KernelSU_SUSFS) (link in releases)
 2. Find vmlinux matching your kernel version (e.g., 5.10, 5.15, 6.5)
 3. **Note:** Generally, offsets are the same for the same major.minor kernel version (e.g., all 5.10.x kernels)
 4. Only the first two version numbers matter (5.10, not 5.10.123)
