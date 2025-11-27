@@ -5,8 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#define TARGET_SYMBOL "__do_sys_capset"
-#define PHYS_ADDR 0x140ca4   // __do_sys_capset - _text
+#define TARGET_SYMBOL "__arm64_sys_capset"
+#define PHYS_ADDR 0x140ca4
 #define MAX_SIZE 0x48c
 #define TMP_BIN "func.bin"
 
@@ -38,9 +38,8 @@ int main(int argc, char *argv[]) {
     printf("Kernel Function Analyzer\n");
     printf("========================\n");
     printf("Function: %s\n", TARGET_SYMBOL);
-    printf("Virtual:  0x%lx\n", VIRT_ADDR);
-    printf("Physical: 0x%lx\n", PHYS_ADDR);
-    printf("Max Size: 0x%lx (%lu bytes)\n\n", MAX_SIZE, MAX_SIZE);
+    printf("Physical: 0x%x\n", PHYS_ADDR);
+    printf("Max Size: 0x%x (%u bytes)\n\n", MAX_SIZE, MAX_SIZE);
     
     // Read maximum possible function size
     fd = open(kernel_file, O_RDONLY);
@@ -79,30 +78,25 @@ int main(int argc, char *argv[]) {
     fwrite(buffer, 1, actual_size, tmp);
     fclose(tmp);
     
-    // Disassemble with objdump
-    printf("=== objdump disassembly ===\n");
+    // Disassemble with radare2
+    printf("=== Disassembly ===\n");
     snprintf(cmd, sizeof(cmd),
-             "objdump -D -b binary -m aarch64 --adjust-vma=0x%lx %s 2>/dev/null",
-             VIRT_ADDR, TMP_BIN);
+             "r2 -a arm -b 64 -q -c 'pd %zu @ 0' %s 2>&1",
+             actual_size / 4, TMP_BIN);
     system(cmd);
     
-    // Disassemble with radare2
-    printf("\n=== radare2 analysis ===\n");
+    // Try objdump if available
+    printf("\n=== Alternative (objdump) ===\n");
     snprintf(cmd, sizeof(cmd),
-             "r2 -a arm -b 64 -q -c 'pd %zu @ 0' %s 2>/dev/null",
-             actual_size / 4, TMP_BIN);
+             "aarch64-linux-gnu-objdump -D -b binary -m aarch64 %s 2>&1",
+             TMP_BIN);
     system(cmd);
     
     // Show function statistics
     printf("\n=== Function Statistics ===\n");
-    printf("Start address:  0x%lx\n", VIRT_ADDR);
-    printf("End address:    0x%lx\n", VIRT_ADDR + actual_size);
-    printf("Function size:  %zu bytes (%zu instructions)\n", actual_size, actual_size / 4);
-    printf("Next function:  0x%lx (ptrace_access_vm)\n", VIRT_NEXT);
-    printf("Gap/padding:    0x%lx bytes\n", VIRT_NEXT - VIRT_ADDR - actual_size);
-    
-    // Cleanup
-    unlink(TMP_BIN);
+    printf("Physical offset: 0x%x\n", PHYS_ADDR);
+    printf("Function size:   %zu bytes (%zu instructions)\n", actual_size, actual_size / 4);
+    printf("Saved to:        %s\n", TMP_BIN);
     
     return 0;
 }
