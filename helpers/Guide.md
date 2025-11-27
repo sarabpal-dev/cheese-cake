@@ -42,6 +42,16 @@ gcc extract-kallsyms.c -o extract-kallsyms
 ./extract-kallsyms /path/to/kernel > kallsyms.txt
 ```
 
+**For v6 kernels or if extract-kallsyms.c doesn't work:**
+
+```bash
+# Clone vmlinux-to-elf
+git clone https://github.com/marin-m/vmlinux-to-elf
+
+# Extract kallsyms using kallsyms-finder
+python3 vmlinux-to-elf/kallsyms-finder /path/to/kernel > kallsyms.txt
+```
+
 ## Step 4: Extract Kernel Symbol Offsets
 
 Run the offset extraction script:
@@ -65,6 +75,10 @@ helpers/analyze.c:
 ```
 
 **Update the specified lines in `exploit.c` and `helpers/analyze.c` with these values.**
+
+**Note on __do_sys_capset (v5 vs v6 kernels):**
+- **v5 kernels**: `__do_sys_capset` exists as a separate symbol - use this address
+- **v6 kernels**: `__do_sys_capset` is inlined into `__arm64_sys_capset` - use `__arm64_sys_capset` address instead
 
 ### Kernel Physical Base Address
 
