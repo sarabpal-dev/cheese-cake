@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#define TARGET_SYMBOL "__arm64_sys_capset"
+#define TARGET_SYMBOL "__do_sys_capset aka. __arm64_sys_capset"
 #define PHYS_ADDR 0x140ca4
 #define MAX_SIZE 0x48c
 #define TMP_BIN "func.bin"
