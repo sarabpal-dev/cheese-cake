@@ -32,35 +32,36 @@ pgd_offset=$(pahole -C mm_struct "$VMLINUX" | grep "pgd_t \*.*pgd;" | grep -oP '
 
 # Print exploit.c changes
 if [ -n "$mm_offset" ]; then
-    printf "Line 123: #define OFFSETOF_TASK_STRUCT_MM 0x%x\n" "$mm_offset"
+    printf "Line 122: #define OFFSETOF_TASK_STRUCT_MM 0x%x\n" "$mm_offset"
 else
     echo "Warning: Could not find task_struct->mm offset"
 fi
 
 if [ -n "$pgd_offset" ]; then
-    printf "Line 124: #define OFFSETOF_MM_PGD 0x%x\n" "$pgd_offset"
+    printf "Line 123: #define OFFSETOF_MM_PGD 0x%x\n" "$pgd_offset"
 else
     echo "Warning: Could not find mm_struct->pgd offset"
 fi
 
 echo ""
-echo "Note: task_struct->tasks, ->pid, ->seccomp offsets are used in task iteration code"
-echo "These are typically hardcoded in the exploit and may need manual verification"
+echo "Hardcoded offsets in exploit.c:"
 
 if [ -n "$tasks_offset" ]; then
-    printf "task_struct->tasks = 0x%x\n" "$tasks_offset"
+    printf "Line 1098, 1108: task_struct->tasks = 0x%x\n" "$tasks_offset"
 else
     echo "Warning: Could not find task_struct->tasks offset"
 fi
 
 if [ -n "$pid_offset" ]; then
-    printf "task_struct->pid = 0x%x\n" "$pid_offset"
+    printf "Line 1112: task_struct->pid = 0x%x\n" "$pid_offset"
 else
     echo "Warning: Could not find task_struct->pid offset"
 fi
 
 if [ -n "$seccomp_offset" ]; then
-    printf "task_struct->seccomp = 0x%x\n" "$seccomp_offset"
+    printf "Line 1724 (seccomp shellcode): task_struct->seccomp = 0x%x\n" "$seccomp_offset"
+    seccomp_filter_offset=$((seccomp_offset + 8))
+    printf "Line 1725 (seccomp shellcode): task_struct->seccomp.filter = 0x%x\n" "$seccomp_filter_offset"
 else
     echo "Warning: Could not find task_struct->seccomp offset"
 fi
